@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Bundled Page</title>
@@ -7,211 +8,264 @@
        açılana dek gösterilen geçici kapak. Asıl davetiye stilleri gömülü
        şablonun içindedir. -->
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #faf9f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-    #__bundler_loading { position: fixed; bottom: 20px; right: 20px; font: 13px/1.4 -apple-system, BlinkMacSystemFont, sans-serif; color: #666; background: #fff; padding: 8px 14px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); z-index: 10000; }
-    #__bundler_thumbnail { position: fixed; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #faf9f5; z-index: 9999; }
-    #__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }
-    #__bundler_placeholder { color: #999; font-size: 14px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #faf9f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #__bundler_loading {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font: 13px/1.4 -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #666;
+      background: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+      z-index: 10000;
+    }
+
+    #__bundler_thumbnail {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #faf9f5;
+      z-index: 9999;
+    }
+
+    #__bundler_thumbnail svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #__bundler_placeholder {
+      color: #999;
+      font-size: 14px;
+    }
   </style>
   <!-- JavaScript kapalıysa: göstergeyi gizle ve uyarı metni göster -->
   <noscript>
-    <style>#__bundler_loading { display: none; }</style>
-    <div style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:10000;">
+    <style>
+      #__bundler_loading {
+        display: none;
+      }
+    </style>
+    <div
+      style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:10000;">
       This page requires JavaScript to display.
     </div>
   </noscript>
 </head>
+
 <body>
   <!-- Paket açılana dek görünen geçici kapak (S&B yer tutucu görseli) -->
   <div id="__bundler_thumbnail">
-  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#7E9A86"></rect><text x="50" y="58" font-family="Georgia,serif" font-size="30" fill="#fff" text-anchor="middle">S&amp;B</text></svg>
-</div>
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" fill="#7E9A86"></rect><text x="50" y="58" font-family="Georgia,serif"
+        font-size="30" fill="#fff" text-anchor="middle">S&amp;B</text>
+    </svg>
+  </div>
   <!-- Sağ altta görünen "Unpacking..." durum yazısı -->
   <div id="__bundler_loading">Unpacking...</div>
 
   <script>
-    
-/* =========================================================================
-   AÇICI (BOOTSTRAPPER) SCRIPT'İ — tasarımı değil, "paketi" çözen motor
-   -------------------------------------------------------------------------
-   Bu HTML kendi içinde paketlenmiş bir sayfadır. ASIL davetiye tasarımı
-   aşağıdaki <script type="__bundler/template"> içinde; kullanılan fontlar ve
-   çalışma zamanı (runtime) ise <script type="__bundler/manifest"> içinde
-   base64 + gzip olarak gömülüdür. Bu script o gömülü veriyi tarayıcıda açıp
-   gerçek sayfayı kurar. Genel akış:
-     1) manifest (varlıklar) ve template (HTML iskeleti) okunur
-     2) her varlık base64'ten çözülür, gerekiyorsa gzip açılır -> Blob URL üretilir
-     3) template içindeki UUID yer tutucuları Blob URL'lerle değiştirilir
-     4) güvenlik öznitelikleri (integrity/crossorigin) temizlenir
-     5) DOMParser ile ayrıştırılıp belge kökü değiştirilir
-     6) <script> etiketleri sıra korunarak yeniden oluşturulur ki çalışsınlar
-   ========================================================================= */
-document.addEventListener('DOMContentLoaded', async function() {
-  // ---- Yükleme göstergesi: sağ alttaki "Unpacking..." kutusunun elemanı ----
-  const loading = document.getElementById('__bundler_loading');
-  function setStatus(msg) { if (loading) loading.textContent = msg; } // göstergedeki metni güncelle
 
-  // [Hata yakalayıcı] Çözme/çalıştırma sırasında oluşan hataları ekranda
-  // kırmızı bir kutuda gösterir. window üzerinde tanımlı olduğu için belge
-  // kökü (documentElement) değişse bile dinleyici hayatta kalır.
-  // Error sink persists across replaceWith since it's on window, not the DOM.
-  window.addEventListener('error', function(e) {
-    var p = document.body || document.documentElement;
-    var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
-    d.id = '__bundler_err';
-    d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2e;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto';
-    d.textContent = (d.textContent ? d.textContent + String.fromCharCode(10) : '') +
-      '[bundle] ' + (e.message || e.type) +
-      (e.filename ? ' (' + e.filename.slice(0, 60) + ':' + e.lineno + ')' : '');
-  }, true);
+    /* =========================================================================
+       AÇICI (BOOTSTRAPPER) SCRIPT'İ — tasarımı değil, "paketi" çözen motor
+       -------------------------------------------------------------------------
+       Bu HTML kendi içinde paketlenmiş bir sayfadır. ASIL davetiye tasarımı
+       aşağıdaki <script type="__bundler/template"> içinde; kullanılan fontlar ve
+       çalışma zamanı (runtime) ise <script type="__bundler/manifest"> içinde
+       base64 + gzip olarak gömülüdür. Bu script o gömülü veriyi tarayıcıda açıp
+       gerçek sayfayı kurar. Genel akış:
+         1) manifest (varlıklar) ve template (HTML iskeleti) okunur
+         2) her varlık base64'ten çözülür, gerekiyorsa gzip açılır -> Blob URL üretilir
+         3) template içindeki UUID yer tutucuları Blob URL'lerle değiştirilir
+         4) güvenlik öznitelikleri (integrity/crossorigin) temizlenir
+         5) DOMParser ile ayrıştırılıp belge kökü değiştirilir
+         6) <script> etiketleri sıra korunarak yeniden oluşturulur ki çalışsınlar
+       ========================================================================= */
+    document.addEventListener('DOMContentLoaded', async function () {
+      // ---- Yükleme göstergesi: sağ alttaki "Unpacking..." kutusunun elemanı ----
+      const loading = document.getElementById('__bundler_loading');
+      function setStatus(msg) { if (loading) loading.textContent = msg; } // göstergedeki metni güncelle
 
-  try {
-    // Gömülü veri etiketlerini bul:
-    //   manifest = varlıklar (fontlar + sıkıştırılmış runtime)
-    //   template = açılacak gerçek HTML iskeleti (davetiye tasarımı)
-    const manifestEl = document.querySelector('script[type="__bundler/manifest"]');
-    const templateEl = document.querySelector('script[type="__bundler/template"]');
-    // İkisinden biri yoksa paket eksik/bozuk demektir -> çözmeyi durdur
-    if (!manifestEl || !templateEl) {
-      setStatus('Error: missing bundle data');
-      console.error('[bundler] Missing script tags — manifestEl:', !!manifestEl, 'templateEl:', !!templateEl);
-      return;
-    }
+      // [Hata yakalayıcı] Çözme/çalıştırma sırasında oluşan hataları ekranda
+      // kırmızı bir kutuda gösterir. window üzerinde tanımlı olduğu için belge
+      // kökü (documentElement) değişse bile dinleyici hayatta kalır.
+      // Error sink persists across replaceWith since it's on window, not the DOM.
+      window.addEventListener('error', function (e) {
+        var p = document.body || document.documentElement;
+        var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
+        d.id = '__bundler_err';
+        d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2e;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto';
+        d.textContent = (d.textContent ? d.textContent + String.fromCharCode(10) : '') +
+          '[bundle] ' + (e.message || e.type) +
+          (e.filename ? ' (' + e.filename.slice(0, 60) + ':' + e.lineno + ')' : '');
+      }, true);
 
-    // Gömülü JSON'ları belleğe al (manifest: nesne, template: HTML metni)
-    const manifest = JSON.parse(manifestEl.textContent);
-    let template = JSON.parse(templateEl.textContent);
-
-    // Her varlık benzersiz bir UUID anahtarıyla saklanır
-    const uuids = Object.keys(manifest);
-    setStatus('Unpacking ' + uuids.length + ' assets...');
-
-    // UUID -> Blob URL eşlemesi burada toplanacak; varlıklar paralel çözülür
-    const blobUrls = {};
-    await Promise.all(uuids.map(async (uuid) => {
-      const entry = manifest[uuid];
       try {
-        // base64 metnini ham bayt dizisine (Uint8Array) çevir
-        const binaryStr = atob(entry.data);
-        const bytes = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-
-        let finalBytes = bytes;
-        // İçerik gzip ile sıkıştırılmışsa tarayıcının DecompressionStream API'si ile aç
-        if (entry.compressed) {
-          if (typeof DecompressionStream !== 'undefined') {
-            const ds = new DecompressionStream('gzip');
-            const writer = ds.writable.getWriter();
-            const reader = ds.readable.getReader();
-            writer.write(bytes);
-            writer.close();
-            const chunks = [];
-            let totalLen = 0;
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              chunks.push(value);
-              totalLen += value.length;
-            }
-            finalBytes = new Uint8Array(totalLen);
-            let offset = 0;
-            for (const chunk of chunks) { finalBytes.set(chunk, offset); offset += chunk.length; }
-          } else {
-            // Çok eski tarayıcı: gzip açma desteklenmiyor -> uyar (bu varlık görünmeyebilir)
-            console.warn('DecompressionStream not available, asset ' + uuid + ' may not render');
-          }
+        // Gömülü veri etiketlerini bul:
+        //   manifest = varlıklar (fontlar + sıkıştırılmış runtime)
+        //   template = açılacak gerçek HTML iskeleti (davetiye tasarımı)
+        const manifestEl = document.querySelector('script[type="__bundler/manifest"]');
+        const templateEl = document.querySelector('script[type="__bundler/template"]');
+        // İkisinden biri yoksa paket eksik/bozuk demektir -> çözmeyi durdur
+        if (!manifestEl || !templateEl) {
+          setStatus('Error: missing bundle data');
+          console.error('[bundler] Missing script tags — manifestEl:', !!manifestEl, 'templateEl:', !!templateEl);
+          return;
         }
 
-        // Çözülen baytlardan Blob URL üret — font/script bu geçici adresle yüklenecek
-        blobUrls[uuid] = URL.createObjectURL(new Blob([finalBytes], { type: entry.mime }));
+        // Gömülü JSON'ları belleğe al (manifest: nesne, template: HTML metni)
+        const manifest = JSON.parse(manifestEl.textContent);
+        let template = JSON.parse(templateEl.textContent);
+
+        // Her varlık benzersiz bir UUID anahtarıyla saklanır
+        const uuids = Object.keys(manifest);
+        setStatus('Unpacking ' + uuids.length + ' assets...');
+
+        // UUID -> Blob URL eşlemesi burada toplanacak; varlıklar paralel çözülür
+        const blobUrls = {};
+        await Promise.all(uuids.map(async (uuid) => {
+          const entry = manifest[uuid];
+          try {
+            // base64 metnini ham bayt dizisine (Uint8Array) çevir
+            const binaryStr = atob(entry.data);
+            const bytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+
+            let finalBytes = bytes;
+            // İçerik gzip ile sıkıştırılmışsa tarayıcının DecompressionStream API'si ile aç
+            if (entry.compressed) {
+              if (typeof DecompressionStream !== 'undefined') {
+                const ds = new DecompressionStream('gzip');
+                const writer = ds.writable.getWriter();
+                const reader = ds.readable.getReader();
+                writer.write(bytes);
+                writer.close();
+                const chunks = [];
+                let totalLen = 0;
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  chunks.push(value);
+                  totalLen += value.length;
+                }
+                finalBytes = new Uint8Array(totalLen);
+                let offset = 0;
+                for (const chunk of chunks) { finalBytes.set(chunk, offset); offset += chunk.length; }
+              } else {
+                // Çok eski tarayıcı: gzip açma desteklenmiyor -> uyar (bu varlık görünmeyebilir)
+                console.warn('DecompressionStream not available, asset ' + uuid + ' may not render');
+              }
+            }
+
+            // Çözülen baytlardan Blob URL üret — font/script bu geçici adresle yüklenecek
+            blobUrls[uuid] = URL.createObjectURL(new Blob([finalBytes], { type: entry.mime }));
+          } catch (err) {
+            // Tek bir varlık çözülemezse boş Blob koy ki sayfa tümden çökmesin
+            console.error('Failed to decode asset ' + uuid + ':', err);
+            blobUrls[uuid] = URL.createObjectURL(new Blob([], { type: entry.mime }));
+          }
+        }));
+
+        // (Opsiyonel) Dış kaynak eşlemesi: mantıksal id -> UUID -> Blob URL
+        const extResEl = document.querySelector('script[type="__bundler/ext_resources"]');
+        const extResources = extResEl ? JSON.parse(extResEl.textContent) : [];
+        const resourceMap = {};
+        for (const entry of extResources) {
+          if (blobUrls[entry.uuid]) resourceMap[entry.id] = blobUrls[entry.uuid];
+        }
+
+        // Artık iskeleti gerçek (Blob) adreslerle dolduruyoruz
+        setStatus('Rendering...');
+        for (const uuid of uuids) template = template.split(uuid).join(blobUrls[uuid]); // her UUID yer tutucusunu Blob URL ile değiştir
+
+        // [Güvenlik öznitelikleri temizleniyor] integrity/crossorigin kaldırılır;
+        // aksi halde file:// kökenli Blob'larda SRI doğrulaması yüklemeyi reddederdi.
+        // Strip integrity + crossorigin — blob URLs from a file:// document inherit
+        // a null origin, so crossorigin forces a CORS fetch that SRI then rejects.
+        // The manifest bytes are ours; SRI protects against CDN compromise, not this.
+        template = template.replace(/\s+integrity="[^"]*"/gi, '').replace(/\s+crossorigin="[^"]*"/gi, '');
+
+        // window.__resources nesnesini sayfaya enjekte eden küçük script (runtime bunu okur)
+        const resourceScript = '<script>window.__resources = ' +
+          JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
+          ';</' + 'script>';
+        // [Enjeksiyon noktası] <head> hemen ardına eklenir; en başa eklemek
+        // DOCTYPE'ı ikinci sıraya düşürüp tarayıcıyı "quirks mode"a sokardı.
+        // Inject after <head> so the DOCTYPE stays first; prepending the script
+        // would push the parser into quirks mode. DOMParser always emits a <head>
+        // (synthesizing one if the source HTML omitted it) but may carry
+        // attributes through, so match the full opening tag. slice() rather than
+        // replace() keeps us clear of $-pattern substitution in resourceScript.
+        const headOpen = template.match(/<head[^>]*>/i);
+        if (headOpen) {
+          const i = headOpen.index + headOpen[0].length;
+          template = template.slice(0, i) + resourceScript + template.slice(i);
+        }
+
+        // [İskeleti DOM'a çevir ve belge kökünü onunla değiştir]
+        // Parse the template and swap the root element. Scripts inserted via
+        // DOMParser/replaceWith are inert per spec — re-create each with
+        // createElement so they execute, awaiting onload for src scripts to
+        // preserve ordering (React before ReactDOM before Babel before text/babel).
+        const doc = new DOMParser().parseFromString(template, 'text/html');
+        document.documentElement.replaceWith(doc.documentElement);
+        // DOMParser ile gelen <script> etiketleri spec gereği ÇALIŞMAZ; aşağıda her
+        // birini createElement ile yeniden oluşturup çalışır hale getiriyoruz
+        // (React -> ReactDOM -> Babel -> text/babel sırası korunarak)
+        const dead = Array.from(document.scripts);
+        for (const old of dead) {
+          const s = document.createElement('script');
+          for (const a of old.attributes) s.setAttribute(a.name, a.value);
+          s.textContent = old.textContent;
+          // [Babel/JSX + src] içeriği indirip satır içine alır: file:// kökeninde
+          // Babel'in XHR'ı Blob URL'i sessizce düşürdüğü için inline'a çeviriyoruz.
+          // text/babel scripts with a src: fetch and inline. transformScriptTags
+          // does XHR against the src, but blob:null/ from a file:// origin is
+          // silently dropped. Inlining makes it a plain inline babel script,
+          // which transformScriptTags handles unconditionally.
+          if ((s.type === 'text/babel' || s.type === 'text/jsx') && s.src) {
+            const r = await fetch(s.src);
+            s.textContent = await r.text();
+            s.removeAttribute('src');
+          }
+          // src'li scriptlerde yüklenmeyi bekle ki çalışma sırası bozulmasın
+          const p = s.src ? new Promise(function (r) { s.onload = s.onerror = r; }) : null;
+          old.replaceWith(s);
+          if (p) await p;
+        }
+        // [Babel'i elle tetikle] DOMContentLoaded biz belgeyi değiştirmeden önce
+        // tetiklenmişti; varsa text/babel scriptlerini şimdi dönüştür.
+        // Babel standalone auto-transforms type=text/babel on DOMContentLoaded,
+        // which fired before we swapped the document. Trigger manually if present.
+        if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
+          window.Babel.transformScriptTags();
+        }
       } catch (err) {
-        // Tek bir varlık çözülemezse boş Blob koy ki sayfa tümden çökmesin
-        console.error('Failed to decode asset ' + uuid + ':', err);
-        blobUrls[uuid] = URL.createObjectURL(new Blob([], { type: entry.mime }));
+        // Beklenmeyen bir hata olursa kullanıcıya göstergede bildir
+        setStatus('Error unpacking: ' + err.message);
+        console.error('Bundle unpack error:', err);
       }
-    }));
-
-    // (Opsiyonel) Dış kaynak eşlemesi: mantıksal id -> UUID -> Blob URL
-    const extResEl = document.querySelector('script[type="__bundler/ext_resources"]');
-    const extResources = extResEl ? JSON.parse(extResEl.textContent) : [];
-    const resourceMap = {};
-    for (const entry of extResources) {
-      if (blobUrls[entry.uuid]) resourceMap[entry.id] = blobUrls[entry.uuid];
-    }
-
-    // Artık iskeleti gerçek (Blob) adreslerle dolduruyoruz
-    setStatus('Rendering...');
-    for (const uuid of uuids) template = template.split(uuid).join(blobUrls[uuid]); // her UUID yer tutucusunu Blob URL ile değiştir
-
-    // [Güvenlik öznitelikleri temizleniyor] integrity/crossorigin kaldırılır;
-    // aksi halde file:// kökenli Blob'larda SRI doğrulaması yüklemeyi reddederdi.
-    // Strip integrity + crossorigin — blob URLs from a file:// document inherit
-    // a null origin, so crossorigin forces a CORS fetch that SRI then rejects.
-    // The manifest bytes are ours; SRI protects against CDN compromise, not this.
-    template = template.replace(/\s+integrity="[^"]*"/gi, '').replace(/\s+crossorigin="[^"]*"/gi, '');
-
-    // window.__resources nesnesini sayfaya enjekte eden küçük script (runtime bunu okur)
-    const resourceScript = '<script>window.__resources = ' +
-      JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
-      ';</' + 'script>';
-    // [Enjeksiyon noktası] <head> hemen ardına eklenir; en başa eklemek
-    // DOCTYPE'ı ikinci sıraya düşürüp tarayıcıyı "quirks mode"a sokardı.
-    // Inject after <head> so the DOCTYPE stays first; prepending the script
-    // would push the parser into quirks mode. DOMParser always emits a <head>
-    // (synthesizing one if the source HTML omitted it) but may carry
-    // attributes through, so match the full opening tag. slice() rather than
-    // replace() keeps us clear of $-pattern substitution in resourceScript.
-    const headOpen = template.match(/<head[^>]*>/i);
-    if (headOpen) {
-      const i = headOpen.index + headOpen[0].length;
-      template = template.slice(0, i) + resourceScript + template.slice(i);
-    }
-
-    // [İskeleti DOM'a çevir ve belge kökünü onunla değiştir]
-    // Parse the template and swap the root element. Scripts inserted via
-    // DOMParser/replaceWith are inert per spec — re-create each with
-    // createElement so they execute, awaiting onload for src scripts to
-    // preserve ordering (React before ReactDOM before Babel before text/babel).
-    const doc = new DOMParser().parseFromString(template, 'text/html');
-    document.documentElement.replaceWith(doc.documentElement);
-    // DOMParser ile gelen <script> etiketleri spec gereği ÇALIŞMAZ; aşağıda her
-    // birini createElement ile yeniden oluşturup çalışır hale getiriyoruz
-    // (React -> ReactDOM -> Babel -> text/babel sırası korunarak)
-    const dead = Array.from(document.scripts);
-    for (const old of dead) {
-      const s = document.createElement('script');
-      for (const a of old.attributes) s.setAttribute(a.name, a.value);
-      s.textContent = old.textContent;
-      // [Babel/JSX + src] içeriği indirip satır içine alır: file:// kökeninde
-      // Babel'in XHR'ı Blob URL'i sessizce düşürdüğü için inline'a çeviriyoruz.
-      // text/babel scripts with a src: fetch and inline. transformScriptTags
-      // does XHR against the src, but blob:null/ from a file:// origin is
-      // silently dropped. Inlining makes it a plain inline babel script,
-      // which transformScriptTags handles unconditionally.
-      if ((s.type === 'text/babel' || s.type === 'text/jsx') && s.src) {
-        const r = await fetch(s.src);
-        s.textContent = await r.text();
-        s.removeAttribute('src');
-      }
-      // src'li scriptlerde yüklenmeyi bekle ki çalışma sırası bozulmasın
-      const p = s.src ? new Promise(function(r) { s.onload = s.onerror = r; }) : null;
-      old.replaceWith(s);
-      if (p) await p;
-    }
-    // [Babel'i elle tetikle] DOMContentLoaded biz belgeyi değiştirmeden önce
-    // tetiklenmişti; varsa text/babel scriptlerini şimdi dönüştür.
-    // Babel standalone auto-transforms type=text/babel on DOMContentLoaded,
-    // which fired before we swapped the document. Trigger manually if present.
-    if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
-      window.Babel.transformScriptTags();
-    }
-  } catch (err) {
-    // Beklenmeyen bir hata olursa kullanıcıya göstergede bildir
-    setStatus('Error unpacking: ' + err.message);
-    console.error('Bundle unpack error:', err);
-  }
-});
+    });
 
   </script>
 
@@ -232,7 +286,8 @@ document.addEventListener('DOMContentLoaded', async function() {
        program, konum, LCV (Google Forms) ve detaylar. JSON string olarak
        gömülüdür; biçimi korunmalıdır. -->
   <script type="__bundler/template">
-"<!DOCTYPE html>\n<html><head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<script>\n/* ============================================================\n   RSVP AYARLARI — SADECE BU 4 DEĞERİ DEĞİŞTİR\n   1) Google Form kur (3 soru), Responses → Sheets'e bağla\n   2) Sağ üst ⋮ → \"Get pre-filled link\" ile formResponse URL + entry ID'leri al\n   3) Aşağıdaki tırnak içlerini doldur, kaydet, yayınla\n   ============================================================ */\nwindow.RSVP_CONFIG = {\n  url: \"https://docs.google.com/forms/d/e/1FAIpQLSdmzd97MneukrXybLM1QE3pZ0R60s4E1SCK_N2LoPdBzwNt1g/formResponse\",\n  fields: {\n    name:   \"entry.1409559390\",\n    attend: \"entry.873594160\",\n    count:  \"entry.134642799\"\n  }\n};\n<\u002Fscript>\n<script src=\"e7bd3fcd-ab60-43bd-bc19-69f44b475b27\"><\u002Fscript>\n<\u002Fhead>\n<body>\n<x-dc>\n<helmet>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin=\"\">\n<style>/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"753ee893-b9b9-46ed-ab3d-a3e34cce1c46\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"66fc050d-1aa9-433e-965e-66b482870de2\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"3f1c6785-ca37-456d-bbc9-c95d3a1343ba\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"da1ac8da-116a-4c30-97b1-a7e6f59db6db\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"ba4d6260-948e-4828-a5fa-7e30c9b22c00\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"753ee893-b9b9-46ed-ab3d-a3e34cce1c46\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"66fc050d-1aa9-433e-965e-66b482870de2\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"3f1c6785-ca37-456d-bbc9-c95d3a1343ba\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"da1ac8da-116a-4c30-97b1-a7e6f59db6db\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"ba4d6260-948e-4828-a5fa-7e30c9b22c00\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"965a98e2-b452-4866-b1f5-e0a16a9ef518\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"6dccb30d-77e4-49a2-8e50-48e5aac25242\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"7411f321-35d2-43b8-ae72-b7b18438cccc\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"8d0bbcbd-6b10-4606-b9a4-f2fa210663bf\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"f3a7cf45-d8cb-4fe0-a623-a0b61a4b20b3\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"965a98e2-b452-4866-b1f5-e0a16a9ef518\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"6dccb30d-77e4-49a2-8e50-48e5aac25242\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"7411f321-35d2-43b8-ae72-b7b18438cccc\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"8d0bbcbd-6b10-4606-b9a4-f2fa210663bf\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"f3a7cf45-d8cb-4fe0-a623-a0b61a4b20b3\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"965a98e2-b452-4866-b1f5-e0a16a9ef518\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"6dccb30d-77e4-49a2-8e50-48e5aac25242\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"7411f321-35d2-43b8-ae72-b7b18438cccc\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"8d0bbcbd-6b10-4606-b9a4-f2fa210663bf\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"f3a7cf45-d8cb-4fe0-a623-a0b61a4b20b3\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"1ced554e-a755-4f3f-8679-5a8ad8f0aea0\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"c85145e9-fb16-42ab-a3c6-0d2095eb33ef\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"29ca6bd0-8cbb-4956-8bcb-431569b0d645\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"1ced554e-a755-4f3f-8679-5a8ad8f0aea0\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"c85145e9-fb16-42ab-a3c6-0d2095eb33ef\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"29ca6bd0-8cbb-4956-8bcb-431569b0d645\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"1ced554e-a755-4f3f-8679-5a8ad8f0aea0\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"c85145e9-fb16-42ab-a3c6-0d2095eb33ef\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"29ca6bd0-8cbb-4956-8bcb-431569b0d645\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Pinyon Script';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"1c508b61-4fae-428f-a3a3-5dfad3179a9c\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Pinyon Script';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"e73b597a-ae6a-451a-8313-77a485047734\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Pinyon Script';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"7c394f1c-4770-406e-9716-61eaf6c6b40c\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n<\u002Fstyle>\n<style>\n  *{box-sizing:border-box;}\n  body{margin:0; background:#DDE4DA;}\n  input,select,button{font-family:inherit;}\n  input:focus,select:focus{border-color:#7E9A86 !important;}\n<\u002Fstyle>\n<\u002Fhelmet>\n\n\n<div style=\"min-height:100vh; display:flex; justify-content:center;\">\n  <div style=\"width:100%; max-width:460px; background:#EDF1EC; box-shadow:0 6px 34px rgba(61,74,59,.16); color:#3D4A3B;\">\n\n    <!-- cover -->\n    <div style=\"padding:60px 36px 48px; text-align:center;\">\n      <div style=\"font:500 12px Jost,sans-serif; letter-spacing:.4em; color:#7E9A86;\">DÜĞÜNÜMÜZE DAVETLİSİNİZ<\u002Fdiv>\n      <div style=\"margin:30px 0 26px; font:italic 400 17px/1.8 'Cormorant Garamond',serif; color:#6E7C6C;\">Bir yaz akşamında,<br>siz sevdiklerimizle birlikte<br>hayatımızın en güzel başlangıcını kutluyoruz<\u002Fdiv>\n      <div style=\"font:400 80px/0.86 'Pinyon Script',cursive; color:#7E9A86;\">Sibel<\u002Fdiv>\n      <div style=\"font:italic 400 26px 'Cormorant Garamond',serif; color:#A6B5A4; margin:8px 0;\">&amp;<\u002Fdiv>\n      <div style=\"font:400 80px/0.86 'Pinyon Script',cursive; color:#7E9A86;\">Berdem<\u002Fdiv>\n      <div style=\"display:flex; align-items:center; justify-content:center; gap:10px; margin:32px 0 0;\">\n        <span style=\"height:1px; width:48px; background:#A6B5A4;\"><\u002Fspan>\n        <span style=\"width:5px; height:5px; transform:rotate(45deg); background:#7E9A86;\"><\u002Fspan>\n        <span style=\"height:1px; width:48px; background:#A6B5A4;\"><\u002Fspan>\n      <\u002Fdiv>\n      <div style=\"margin-top:24px; font:500 15px Jost,sans-serif; letter-spacing:.18em; color:#3D4A3B;\">29 AĞUSTOS 2026 · CUMARTESİ<\u002Fdiv>\n      <div style=\"margin-top:7px; font:400 13px Jost,sans-serif; letter-spacing:.16em; color:#6E7C6C;\">NİKAH 18:30 · GAİA URLA<\u002Fdiv>\n    <\u002Fdiv>\n\n    <!-- families -->\n    <div style=\"padding:34px 36px; text-align:center; border-top:1px solid #D7E0D4;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:18px;\">Saygılarımızla<\u002Fdiv>\n      <div style=\"font:400 19px/1.5 'Cormorant Garamond',serif; color:#3D4A3B;\">Aysel &amp; Hasan<br>Yavuz Ailesi<\u002Fdiv>\n      <div style=\"font:italic 400 14px 'Cormorant Garamond',serif; color:#A6B5A4; margin:7px 0;\">ile<\u002Fdiv>\n      <div style=\"font:400 19px/1.5 'Cormorant Garamond',serif; color:#3D4A3B;\">Zübeyde &amp; Tuncer<br>Fırat Ailesi<\u002Fdiv>\n    <\u002Fdiv>\n\n    <!-- program -->\n    <div style=\"padding:42px 36px; text-align:center; background:#E3EAE1;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86;\">Düğün Akışı<\u002Fdiv>\n      <div style=\"font:400 28px 'Cormorant Garamond',serif; color:#3D4A3B; margin-top:6px;\">Program<\u002Fdiv>\n      <div style=\"max-width:280px; margin:22px auto 0;\">\n        <div style=\"display:flex; align-items:baseline; justify-content:space-between; padding:15px 4px; border-bottom:1px solid #CDD9CB;\">\n          <span style=\"font:500 14px Jost,sans-serif; letter-spacing:.12em; color:#7E9A86;\">18:00<\u002Fspan>\n          <span style=\"font:400 20px 'Cormorant Garamond',serif; color:#3D4A3B;\">Karşılama<\u002Fspan>\n        <\u002Fdiv>\n        <div style=\"display:flex; align-items:baseline; justify-content:space-between; padding:15px 4px; border-bottom:1px solid #CDD9CB;\">\n          <span style=\"font:500 14px Jost,sans-serif; letter-spacing:.12em; color:#7E9A86;\">18:30<\u002Fspan>\n          <span style=\"font:400 20px 'Cormorant Garamond',serif; color:#3D4A3B;\">Nikah Töreni<\u002Fspan>\n        <\u002Fdiv>\n        <div style=\"display:flex; align-items:baseline; justify-content:space-between; padding:15px 4px;\">\n          <span style=\"font:500 14px Jost,sans-serif; letter-spacing:.12em; color:#7E9A86;\">19:00<\u002Fspan>\n          <span style=\"font:400 20px 'Cormorant Garamond',serif; color:#3D4A3B;\">Yemek<\u002Fspan>\n        <\u002Fdiv>\n      <\u002Fdiv>\n    <\u002Fdiv>\n\n    <!-- konum -->\n    <div style=\"padding:42px 36px; text-align:center;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:14px;\">Konum<\u002Fdiv>\n      <div style=\"font:400 30px 'Cormorant Garamond',serif; color:#3D4A3B;\">GAİA Urla<\u002Fdiv>\n      <div style=\"font:400 15px/1.7 'Cormorant Garamond',serif; color:#6E7C6C; margin-top:8px;\">Rüstem Mah. Pınarlı Sk. No:2<br>Urla / İzmir<\u002Fdiv>\n      <a href=\"https://www.google.com/maps/dir/?api=1&amp;destination=38.331469,26.753942\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-block; margin-top:22px; padding:13px 30px; border:1px solid #7E9A86; color:#5E7560; font:500 12px Jost,sans-serif; letter-spacing:.18em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:all .2s;\" style-hover=\"background:#7E9A86; color:#ffffff;\">Yol Tarifi<\u002Fa>\n    <\u002Fdiv>\n\n    <!-- lcv -->\n    <div style=\"padding:42px 36px; text-align:center; background:#E3EAE1;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:10px;\">LÜTFEN CEVAP VERİNİZ<\u002Fdiv>\n      <div style=\"font:italic 400 17px/1.6 'Cormorant Garamond',serif; color:#6E7C6C;\">Bizimle olmanız bizim için çok değerli — katılımınızı bildirir misiniz?<\u002Fdiv>\n      <sc-if value=\"{{ rsvpDone }}\" hint-placeholder-val=\"{{ false }}\">\n        <div style=\"margin-top:20px; padding:16px; border:1px solid #CDD9CB; border-radius:2px; font:400 16px 'Cormorant Garamond',serif; color:#3D4A3B;\">Teşekkür ederiz, yanıtınız bize ulaştı.<\u002Fdiv>\n      <\u002Fsc-if>\n      <sc-if value=\"{{ rsvpPending }}\" hint-placeholder-val=\"{{ true }}\">\n        <button onclick=\"{{ toggle }}\" style=\"margin-top:20px; padding:13px 30px; background:#7E9A86; color:#ffffff; border:none; font:500 12px Jost,sans-serif; letter-spacing:.18em; text-transform:uppercase; border-radius:2px; cursor:pointer; transition:background .2s;\" style-hover=\"background:#688070;\">Katılımımı Bildir<\u002Fbutton>\n        <sc-if value=\"{{ rsvpOpen }}\" hint-placeholder-val=\"{{ false }}\">\n          <form onsubmit=\"{{ submit }}\" style=\"margin-top:20px; text-align:left; display:flex; flex-direction:column; gap:12px;\">\n            <input type=\"text\" required=\"\" placeholder=\"Adınız Soyadınız\" style=\"padding:12px 14px; border:1px solid #CDD9CB; background:#F5F8F4; font:400 14px 'Cormorant Garamond',serif; color:#3D4A3B; border-radius:2px; outline:none;\">\n            <select style=\"padding:12px 14px; border:1px solid #CDD9CB; background:#F5F8F4; font:400 14px 'Cormorant Garamond',serif; color:#3D4A3B; border-radius:2px; outline:none;\">\n              <option value=\"Katılıyorum\">Katılıyorum<\u002Foption>\n              <option value=\"Katılamıyorum\">Maalesef katılamıyorum<\u002Foption>\n            <\u002Fselect>\n            <select style=\"padding:12px 14px; border:1px solid #CDD9CB; background:#F5F8F4; font:400 14px 'Cormorant Garamond',serif; color:#3D4A3B; border-radius:2px; outline:none;\">\n              <option value=\"1 Kişi\">1 Kişi<\u002Foption>\n              <option value=\"2 Kişi\">2 Kişi<\u002Foption>\n            <\u002Fselect>\n            <button type=\"submit\" style=\"padding:13px; background:#7E9A86; color:#ffffff; border:none; font:500 12px Jost,sans-serif; letter-spacing:.18em; text-transform:uppercase; border-radius:2px; cursor:pointer;\">Gönder<\u002Fbutton>\n          <\u002Fform>\n        <\u002Fsc-if>\n      <\u002Fsc-if>\n    <\u002Fdiv>\n\n    <!-- detaylar -->\n    <div style=\"padding:38px 36px 52px; text-align:center; border-top:1px solid #D7E0D4;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:16px;\">Detaylar<\u002Fdiv>\n      <div style=\"font:400 16px 'Cormorant Garamond',serif; color:#3D4A3B;\">Davetiyemiz 2 kişiliktir.<\u002Fdiv>\n      <div style=\"font:italic 400 14px/1.7 'Cormorant Garamond',serif; color:#6E7C6C; margin-top:8px;\">Çocuklara iyi uykular diler,<br>anlayışınız için teşekkür ederiz.<\u002Fdiv>\n      <div style=\"display:flex; align-items:center; justify-content:center; gap:10px; margin:28px 0 18px;\">\n        <span style=\"height:1px; width:40px; background:#A6B5A4;\"><\u002Fspan>\n        <span style=\"width:4px; height:4px; transform:rotate(45deg); background:#7E9A86;\"><\u002Fspan>\n        <span style=\"height:1px; width:40px; background:#A6B5A4;\"><\u002Fspan>\n      <\u002Fdiv>\n      <div style=\"font:400 42px 'Pinyon Script',cursive; color:#5E7560;\">Görüşmek dileğiyle<\u002Fdiv>\n    <\u002Fdiv>\n\n  <\u002Fdiv>\n<\u002Fdiv>\n<\u002Fx-dc>\n<script type=\"text/x-dc\" data-dc-script=\"\">\nclass Component extends DCLogic {\n  state = { open: false, done: false };\n  renderVals() {\n    const CFG = (typeof window !== 'undefined' && window.RSVP_CONFIG) || {};\n    const FF = CFG.fields || {};\n    const FORM = CFG.url || '';\n    return {\n      rsvpOpen: this.state.open,\n      rsvpDone: this.state.done,\n      rsvpPending: !this.state.done,\n      toggle: () => this.setState(s => ({ open: !s.open })),\n      submit: async e => {\n        if (e && e.preventDefault) e.preventDefault();\n        const c = e.target.querySelectorAll('input, select');\n        const body = new URLSearchParams();\n        body.append(FF.name || 'entry.1777073726', c[0] ? c[0].value : '');\n        body.append(FF.attend || 'entry.852144472', c[1] ? c[1].value : '');\n        body.append(FF.count || 'entry.752381510', c[2] ? c[2].value : '');\n        try { await fetch(FORM, { method: 'POST', mode: 'no-cors', body }); } catch (err) {}\n        this.setState({ done: true, open: false });\n      },\n    };\n  }\n}\n<\u002Fscript>\n\n\n<\u002Fbody><\u002Fhtml>"
-  </script>
+"<!DOCTYPE html>\n<html><head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<script>\n/* ============================================================\n   RSVP AYARLARI — SADECE BU 4 DEĞERİ DEĞİŞTİR\n   1) Google Form kur (3 soru), Responses → Sheets'e bağla\n   2) Sağ üst ⋮ → \"Get pre-filled link\" ile formResponse URL + entry ID'leri al\n   3) Aşağıdaki tırnak içlerini doldur, kaydet, yayınla\n   ============================================================ */\nwindow.RSVP_CONFIG = {\n  url: \"https://docs.google.com/forms/d/e/1FAIpQLScckl3j_jALc58jOmva_Lep3T1FY6s8cOTno9sZ6e_vb2RLXQ/formResponse\",\n  fields: {\n    name:   \"entry.1494314732\",\n    attend: \"entry.601422256\",\n    count:  \"entry.696079629\"\n  }\n};\n<\/script>\n<script src=\"e7bd3fcd-ab60-43bd-bc19-69f44b475b27\"><\/script>\n</head>\n<body>\n<x-dc>\n<helmet>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin=\"\">\n<style>/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"753ee893-b9b9-46ed-ab3d-a3e34cce1c46\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"66fc050d-1aa9-433e-965e-66b482870de2\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"3f1c6785-ca37-456d-bbc9-c95d3a1343ba\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"da1ac8da-116a-4c30-97b1-a7e6f59db6db\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"ba4d6260-948e-4828-a5fa-7e30c9b22c00\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"753ee893-b9b9-46ed-ab3d-a3e34cce1c46\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"66fc050d-1aa9-433e-965e-66b482870de2\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"3f1c6785-ca37-456d-bbc9-c95d3a1343ba\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"da1ac8da-116a-4c30-97b1-a7e6f59db6db\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: italic;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"ba4d6260-948e-4828-a5fa-7e30c9b22c00\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"965a98e2-b452-4866-b1f5-e0a16a9ef518\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"6dccb30d-77e4-49a2-8e50-48e5aac25242\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"7411f321-35d2-43b8-ae72-b7b18438cccc\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"8d0bbcbd-6b10-4606-b9a4-f2fa210663bf\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"f3a7cf45-d8cb-4fe0-a623-a0b61a4b20b3\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"965a98e2-b452-4866-b1f5-e0a16a9ef518\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"6dccb30d-77e4-49a2-8e50-48e5aac25242\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"7411f321-35d2-43b8-ae72-b7b18438cccc\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"8d0bbcbd-6b10-4606-b9a4-f2fa210663bf\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"f3a7cf45-d8cb-4fe0-a623-a0b61a4b20b3\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"965a98e2-b452-4866-b1f5-e0a16a9ef518\") format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"6dccb30d-77e4-49a2-8e50-48e5aac25242\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"7411f321-35d2-43b8-ae72-b7b18438cccc\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"8d0bbcbd-6b10-4606-b9a4-f2fa210663bf\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Cormorant Garamond';\n  font-style: normal;\n  font-weight: 600;\n  font-display: swap;\n  src: url(\"f3a7cf45-d8cb-4fe0-a623-a0b61a4b20b3\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"1ced554e-a755-4f3f-8679-5a8ad8f0aea0\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"c85145e9-fb16-42ab-a3c6-0d2095eb33ef\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url(\"29ca6bd0-8cbb-4956-8bcb-431569b0d645\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"1ced554e-a755-4f3f-8679-5a8ad8f0aea0\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"c85145e9-fb16-42ab-a3c6-0d2095eb33ef\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"29ca6bd0-8cbb-4956-8bcb-431569b0d645\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"1ced554e-a755-4f3f-8679-5a8ad8f0aea0\") format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"c85145e9-fb16-42ab-a3c6-0d2095eb33ef\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url(\"29ca6bd0-8cbb-4956-8bcb-431569b0d645\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Pinyon Script';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"1c508b61-4fae-428f-a3a3-5dfad3179a9c\") format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Pinyon Script';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"e73b597a-ae6a-451a-8313-77a485047734\") format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Pinyon Script';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url(\"7c394f1c-4770-406e-9716-61eaf6c6b40c\") format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n</style>\n<style>\n  *{box-sizing:border-box;}\n  body{margin:0; background:#DDE4DA;}\n  input,select,button{font-family:inherit;}\n  input:focus,select:focus{border-color:#7E9A86 !important;}\n</style>\n</helmet>\n\n\n<div style=\"min-height:100vh; display:flex; justify-content:center;\">\n  <div style=\"width:100%; max-width:460px; background:#EDF1EC; box-shadow:0 6px 34px rgba(61,74,59,.16); color:#3D4A3B;\">\n\n    <!-- cover -->\n    <div style=\"padding:60px 36px 48px; text-align:center;\">\n      <div style=\"font:500 12px Jost,sans-serif; letter-spacing:.4em; color:#7E9A86;\">DÜĞÜNÜMÜZE DAVETLİSİNİZ</div>\n      <div style=\"margin:30px 0 26px; font:italic 400 17px/1.8 'Cormorant Garamond',serif; color:#6E7C6C;\">Bir yaz akşamında,<br>siz sevdiklerimizle birlikte<br>hayatımızın en güzel başlangıcını kutluyoruz</div>\n      <div style=\"font:400 80px/0.86 'Pinyon Script',cursive; color:#7E9A86;\">Sibel</div>\n      <div style=\"font:italic 400 26px 'Cormorant Garamond',serif; color:#A6B5A4; margin:8px 0;\">&amp;</div>\n      <div style=\"font:400 80px/0.86 'Pinyon Script',cursive; color:#7E9A86;\">Berdem</div>\n      <div style=\"display:flex; align-items:center; justify-content:center; gap:10px; margin:32px 0 0;\">\n        <span style=\"height:1px; width:48px; background:#A6B5A4;\"></span>\n        <span style=\"width:5px; height:5px; transform:rotate(45deg); background:#7E9A86;\"></span>\n        <span style=\"height:1px; width:48px; background:#A6B5A4;\"></span>\n      </div>\n      <div style=\"margin-top:24px; font:500 15px Jost,sans-serif; letter-spacing:.18em; color:#3D4A3B;\">29 AĞUSTOS 2026 · CUMARTESİ</div>\n      <div style=\"margin-top:7px; font:400 13px Jost,sans-serif; letter-spacing:.16em; color:#6E7C6C;\">NİKAH 18:30 · GAİA URLA</div>\n    </div>\n\n    <!-- families -->\n    <div style=\"padding:34px 36px; text-align:center; border-top:1px solid #D7E0D4;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:18px;\">Saygılarımızla</div>\n      <div style=\"font:400 19px/1.5 'Cormorant Garamond',serif; color:#3D4A3B;\">Aysel &amp; Hasan<br>Yavuz Ailesi</div>\n      <div style=\"font:italic 400 14px 'Cormorant Garamond',serif; color:#A6B5A4; margin:7px 0;\">ile</div>\n      <div style=\"font:400 19px/1.5 'Cormorant Garamond',serif; color:#3D4A3B;\">Zübeyde &amp; Tuncer<br>Fırat Ailesi</div>\n    </div>\n\n    <!-- program -->\n    <div style=\"padding:42px 36px; text-align:center; background:#E3EAE1;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86;\">Düğün Akışı</div>\n      <div style=\"font:400 28px 'Cormorant Garamond',serif; color:#3D4A3B; margin-top:6px;\">Program</div>\n      <div style=\"max-width:280px; margin:22px auto 0;\">\n        <div style=\"display:flex; align-items:baseline; justify-content:space-between; padding:15px 4px; border-bottom:1px solid #CDD9CB;\">\n          <span style=\"font:500 14px Jost,sans-serif; letter-spacing:.12em; color:#7E9A86;\">18:00</span>\n          <span style=\"font:400 20px 'Cormorant Garamond',serif; color:#3D4A3B;\">Karşılama</span>\n        </div>\n        <div style=\"display:flex; align-items:baseline; justify-content:space-between; padding:15px 4px; border-bottom:1px solid #CDD9CB;\">\n          <span style=\"font:500 14px Jost,sans-serif; letter-spacing:.12em; color:#7E9A86;\">18:30</span>\n          <span style=\"font:400 20px 'Cormorant Garamond',serif; color:#3D4A3B;\">Nikah Töreni</span>\n        </div>\n        <div style=\"display:flex; align-items:baseline; justify-content:space-between; padding:15px 4px;\">\n          <span style=\"font:500 14px Jost,sans-serif; letter-spacing:.12em; color:#7E9A86;\">19:00</span>\n          <span style=\"font:400 20px 'Cormorant Garamond',serif; color:#3D4A3B;\">Yemek</span>\n        </div>\n      </div>\n    </div>\n\n    <!-- konum -->\n    <div style=\"padding:42px 36px; text-align:center;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:14px;\">Konum</div>\n      <div style=\"font:400 30px 'Cormorant Garamond',serif; color:#3D4A3B;\">GAİA Urla</div>\n      <div style=\"font:400 15px/1.7 'Cormorant Garamond',serif; color:#6E7C6C; margin-top:8px;\">Rüstem Mah. Pınarlı Sk. No:2<br>Urla / İzmir</div>\n      <a href=\"https://www.google.com/maps/dir/?api=1&amp;destination=38.331469,26.753942\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-block; margin-top:22px; padding:13px 30px; border:1px solid #7E9A86; color:#5E7560; font:500 12px Jost,sans-serif; letter-spacing:.18em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:all .2s;\" style-hover=\"background:#7E9A86; color:#ffffff;\">Yol Tarifi</a>\n    </div>\n\n    <!-- lcv -->\n    <div style=\"padding:42px 36px; text-align:center; background:#E3EAE1;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:10px;\">LÜTFEN CEVAP VERİNİZ</div>\n      <div style=\"font:italic 400 17px/1.6 'Cormorant Garamond',serif; color:#6E7C6C;\">Bizimle olmanız bizim için çok değerli — katılımınızı bildirir misiniz?</div>\n      <sc-if value=\"{{ rsvpDone }}\" hint-placeholder-val=\"{{ false }}\">\n        <div style=\"margin-top:20px; padding:16px; border:1px solid #CDD9CB; border-radius:2px; font:400 16px 'Cormorant Garamond',serif; color:#3D4A3B;\">Teşekkür ederiz, yanıtınız bize ulaştı.</div>\n      </sc-if>\n      <sc-if value=\"{{ rsvpPending }}\" hint-placeholder-val=\"{{ true }}\">\n        <button onclick=\"{{ toggle }}\" style=\"margin-top:20px; padding:13px 30px; background:#7E9A86; color:#ffffff; border:none; font:500 12px Jost,sans-serif; letter-spacing:.18em; text-transform:uppercase; border-radius:2px; cursor:pointer; transition:background .2s;\" style-hover=\"background:#688070;\">Katılımımı Bildir</button>\n        <sc-if value=\"{{ rsvpOpen }}\" hint-placeholder-val=\"{{ false }}\">\n          <form onsubmit=\"{{ submit }}\" style=\"margin-top:20px; text-align:left; display:flex; flex-direction:column; gap:12px;\">\n            <input type=\"text\" required=\"\" placeholder=\"Adınız Soyadınız\" style=\"padding:12px 14px; border:1px solid #CDD9CB; background:#F5F8F4; font:400 14px 'Cormorant Garamond',serif; color:#3D4A3B; border-radius:2px; outline:none;\">\n            <select style=\"padding:12px 14px; border:1px solid #CDD9CB; background:#F5F8F4; font:400 14px 'Cormorant Garamond',serif; color:#3D4A3B; border-radius:2px; outline:none;\">\n              <option value=\"Katılıyorum\">Katılıyorum</option>\n              <option value=\"Katılamıyorum\">Maalesef katılamıyorum</option>\n            </select>\n            <select style=\"padding:12px 14px; border:1px solid #CDD9CB; background:#F5F8F4; font:400 14px 'Cormorant Garamond',serif; color:#3D4A3B; border-radius:2px; outline:none;\">\n              <option value=\"1 Kişi\">1 Kişi</option>\n              <option value=\"2 Kişi\">2 Kişi</option>\n            </select>\n            <button type=\"submit\" style=\"padding:13px; background:#7E9A86; color:#ffffff; border:none; font:500 12px Jost,sans-serif; letter-spacing:.18em; text-transform:uppercase; border-radius:2px; cursor:pointer;\">Gönder</button>\n          </form>\n        </sc-if>\n      </sc-if>\n    </div>\n\n    <!-- detaylar -->\n    <div style=\"padding:38px 36px 52px; text-align:center; border-top:1px solid #D7E0D4;\">\n      <div style=\"font:500 11px Jost,sans-serif; letter-spacing:.32em; text-transform:uppercase; color:#7E9A86; margin-bottom:16px;\">Detaylar</div>\n      <div style=\"font:400 16px 'Cormorant Garamond',serif; color:#3D4A3B;\">Davetiyemiz 2 kişiliktir.</div>\n      <div style=\"font:italic 400 14px/1.7 'Cormorant Garamond',serif; color:#6E7C6C; margin-top:8px;\">Çocuklara iyi uykular diler,<br>anlayışınız için teşekkür ederiz.</div>\n      <div style=\"display:flex; align-items:center; justify-content:center; gap:10px; margin:28px 0 18px;\">\n        <span style=\"height:1px; width:40px; background:#A6B5A4;\"></span>\n        <span style=\"width:4px; height:4px; transform:rotate(45deg); background:#7E9A86;\"></span>\n        <span style=\"height:1px; width:40px; background:#A6B5A4;\"></span>\n      </div>\n      <div style=\"font:400 42px 'Pinyon Script',cursive; color:#5E7560;\">Görüşmek dileğiyle</div>\n    </div>\n\n  </div>\n</div>\n</x-dc>\n<script type=\"text/x-dc\" data-dc-script=\"\">\nclass Component extends DCLogic {\n  state = { open: false, done: false };\n  renderVals() {\n    const CFG = (typeof window !== 'undefined' && window.RSVP_CONFIG) || {};\n    const FF = CFG.fields || {};\n    const FORM = CFG.url || '';\n    return {\n      rsvpOpen: this.state.open,\n      rsvpDone: this.state.done,\n      rsvpPending: !this.state.done,\n      toggle: () => this.setState(s => ({ open: !s.open })),\n      submit: async e => {\n        if (e && e.preventDefault) e.preventDefault();\n        const c = e.target.querySelectorAll('input, select');\n        const body = new URLSearchParams();\n        body.append(FF.name || 'entry.1777073726', c[0] ? c[0].value : '');\n        body.append(FF.attend || 'entry.852144472', c[1] ? c[1].value : '');\n        body.append(FF.count || 'entry.752381510', c[2] ? c[2].value : '');\n        try { await fetch(FORM, { method: 'POST', mode: 'no-cors', body }); } catch (err) {}\n        this.setState({ done: true, open: false });\n      },\n    };\n  }\n}\n<\/script>\n\n\n</body></html>"
+</script>
 </body>
+
 </html>
